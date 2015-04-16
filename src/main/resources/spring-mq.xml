@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<!-- 发送消息的目的地（一个队列） -->
+	<bean id="queueDestination" class="org.apache.activemq.command.ActiveMQQueue"> 
+            <!-- 设置消息队列的名字 -->
+		<constructor-arg index="0" value="dtsQueue" />
+	</bean>
+
+	<bean id="messageConvert" class="com.zenglm.dts.mq.MsgConverter" />
+       
+    
+    <!-- 配置JMS模版 --> 
+    <!-- 配置JMS连接工厂 -->
+	<bean id="connectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">
+		<property name="brokerURL" value="tcp://localhost:61616" />
+	</bean>
+
+	<bean id="queueTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="defaultDestination" ref="queueDestination" />
+		<property name="messageConverter" ref="messageConvert" />
+	</bean>
+
+	<bean id="messageListener"
+		class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+		<constructor-arg>
+			<bean class="com.zenglm.dts.mq.MsgListener" />
+		</constructor-arg>
+		<property name="defaultListenerMethod" value="onMessage" />
+		<property name="messageConverter" ref="messageConvert" />
+	</bean>
+
+	<bean id="queueListenerContainer"
+		class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="destination" ref="queueDestination" />
+		<property name="messageListener" ref="messageListener" />
+		<property name="transactionManager" ref="jmsTransactionManager" />
+	</bean>
+
+	<bean id="jmsTransactionManager"
+		class="org.springframework.jms.connection.JmsTransactionManager">
+		<property name="connectionFactory" ref="connectionFactory" />
+	</bean>
+</beans>

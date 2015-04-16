@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zenglm.dts.dao.AccountDao">
+	<cache eviction="FIFO" flushInterval="60000" size="1024" readOnly="true" />
+	<resultMap id="result" type="account">
+		<result property="username" column="userid" />
+		<result property="email" column="email" />
+		<result property="firstName" column="firstname" />
+		<result property="lastName" column="lastname" />
+		<result property="status" column="status" />
+		<result property="address1" column="addr1" />
+		<result property="address2" column="addr2" />
+		<result property="city" column="city" />
+		<result property="state" column="state" />
+		<result property="zip" column="zip" />
+		<result property="country" column="country" />
+		<result property="phone" column="phone" />
+		<result property="languagePreference" column="langpref" />
+		<result property="favouriteCategoryId" column="favcategory" />
+		<result property="listOption" column="mylistopt" />
+		<result property="bannerOption" column="banneropt" />
+		<result property="bannerName" column="bannername" />
+	</resultMap>
+	
+	<select id="getAccount" resultMap="result" useCache="true">
+  <![CDATA[select
+          userid,
+          email,
+          firstname,
+          lastname,
+          status,
+          addr1,
+          addr2,
+          city,
+          state,
+          zip,
+          country,
+          phone
+    from account 
+    where userid = #{value}
+      ]]>
+	</select>
+	<update id="updateAccount" parameterType="account" flushCache="true">
+  <![CDATA[
+    update account set email = #{email} where userid = #{username}
+  ]]>
+	</update>
+	
+	<update id="updateEmail" parameterType="java.util.Map" flushCache="true">
+  <![CDATA[
+    update account set email = #{email} where userid = #{username}
+  ]]>
+	</update>
+	
+	<select id="getUserList" resultType="user">
+		select id,name||'update' name from test
+	</select>
+	
+	<insert id="insertTest" parameterType="user">
+		insert into test (id,name) values (#{id},#{name})
+	</insert>
+	
+	<insert id="batchInsert" parameterType="java.util.List">
+		 insert into test (id,name)
+		 <foreach collection="list" item="item" index="index" separator="union all">  
+   		  select ${item.id}, '${item.name}' from dual
+   		 </foreach>  
+	</insert>
+	
+	<update id="updateTest" parameterType="user">
+		update test set name = #{name} where id = #{id}
+	</update>
+</mapper>

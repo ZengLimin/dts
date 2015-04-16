@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:cxf="http://cxf.apache.org/core"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+           http://www.springframework.org/schema/context  
+           http://www.springframework.org/schema/context/spring-context-4.0.xsd
+           http://cxf.apache.org/jaxws   
+    	   http://cxf.apache.org/schemas/jaxws.xsd
+    	   http://www.springframework.org/schema/aop   
+           http://www.springframework.org/schema/aop/spring-aop-4.0.xsd ">
+     <aop:aspectj-autoproxy />
+	<!-- 配置要扫描的包 -->
+	<context:component-scan base-package="cn.com.chinatelecom,com.zenglm.dts.aop" />
+	
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<!-- <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />-->
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" /> 
+	<!-- 采用注释的方式配置bean -->
+	<context:annotation-config />
+
+	
+
+	<!-- <bean id="SendSmsImpl"
+		class="cn.com.chinatelecom.wsdl.ctcc.sms.send.v2_1._interface.SendSmsImpl" />
+
+	<jaxws:endpoint id="SendSms" implementor="#SendSmsImpl"
+		address="/SMS/SendSms" />
+	
+	
+	 <bean id="client" class="cn.com.chinatelecom.wsdl.ctcc.sms.send.v2_1._interface.SendSms" factory-bean="clientFactory"  
+        factory-method="create" />  
+          
+    <bean id="clientFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">  
+        <property name="serviceClass" value="cn.com.chinatelecom.wsdl.ctcc.sms.send.v2_1._interface.SendSms" />  
+        <property name="address" value="http://221.236.6.218:5080/isag/North/SMS/SendSms" />      
+    </bean>
+    http://221.236.6.218:5080/isag/North/SMS/SendSms
+    http://localhost:8080/isag/North/SMS/SendSms
+      -->
+	 <jaxws:client id="client"
+		serviceClass="cn.com.chinatelecom.wsdl.ctcc.sms.send.v2_1._interface.SendSms"
+		address="http://221.236.6.218:5080/isag/North/SMS/SendSms">
+		<jaxws:outInterceptors>
+			<bean class="com.zenglm.cxf.SendSmsInterceptor" />
+			<!-- <bean class="org.apache.cxf.interceptor.LoggingInInterceptor" /> -->
+		</jaxws:outInterceptors>
+	<!-- 	<jaxws:inInterceptors>
+			<bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
+		</jaxws:inInterceptors> -->
+		<jaxws:inFaultInterceptors>
+			<!-- <bean class="org.apache.cxf.interceptor.LoggingInInterceptor" /> -->
+			<bean class="com.zenglm.cxf.ExceptionInterceptor" />
+		</jaxws:inFaultInterceptors>
+    <!-- address="http://182.140.240.103:8080/sc/sms/SmsNotification"> -->
+	</jaxws:client> 
+	<!-- http://182.140.240.103:65100/sc/sms/recvStatus -->
+	<jaxws:client id="SmsNotification"
+		serviceClass="cn.com.chinatelecom.wsdl.ctcc.sms.notification.v2_1._interface.SmsNotification"
+		address="http://localhost:8080/sms/sms/recvStatus">
+	</jaxws:client>
+</beans>

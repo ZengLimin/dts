@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<bean id="redisSentinel" class="com.zenglm.dts.redis.JedisSentinelShardPool">
+		<constructor-arg index="0" value="mymaster" />
+		<constructor-arg index="1">
+			<set>
+				<value>127.0.0.1:26379</value>
+			</set>
+		</constructor-arg>
+		<constructor-arg index="2" ref="jedisPoolConfig" />
+	</bean>
+
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="1000" />
+		<property name="maxIdle" value="10" />
+		<property name="minIdle" value="1" />
+		<property name="maxWaitMillis" value="30000" />
+		<property name="testOnBorrow" value="true" />
+		<property name="testOnReturn" value="true" />
+		<property name="testWhileIdle" value="true" />
+	</bean>
+
+	<bean id="shardedJedisPool" class="redis.clients.jedis.ShardedJedisPool"
+		destroy-method="destroy">
+		<constructor-arg ref="jedisPoolConfig" />
+		<constructor-arg>
+			<list>
+				 <bean class="redis.clients.jedis.JedisShardInfo">
+					<constructor-arg value="127.0.0.1" />
+					<constructor-arg type="int" value="6379" />
+					<constructor-arg value="instance:01" />
+				</bean>
+				<bean class="redis.clients.jedis.JedisShardInfo">
+					<constructor-arg value="127.0.0.1" />
+					<constructor-arg type="int" value="6380" />
+					<constructor-arg value="instance:02" />
+				</bean>
+				<!-- <bean class="redis.clients.jedis.JedisShardInfo">
+					<constructor-arg value="127.0.0.1" />
+					<constructor-arg type="int" value="7003" />
+					<constructor-arg value="instance:03" />
+				</bean>  -->
+			</list>
+		</constructor-arg>
+	</bean>
+</beans>
